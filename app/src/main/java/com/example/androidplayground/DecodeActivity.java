@@ -28,8 +28,9 @@ public class DecodeActivity extends AppCompatActivity {
      *      after the waiting time. if there is no any response comes from MediaCodec,
      *      that would be treated as timeout.
      */
-//    private static final long WAITING_TIME = 10000;
-    private static final long WAITING_TIME = -1;
+    private static final long WAITING_TIME = 10000;
+//    private static final long WAITING_TIME = 0;
+//    private static final long WAITING_TIME = -1;
     private String TAG = "DecodeActivity";
     private static final String SAMPLE = "/sdcard/Download/sample.mp4";
     private PlayerThread mediaCodecPlayer = null;
@@ -222,6 +223,7 @@ public class DecodeActivity extends AppCompatActivity {
         private MediaExtractor audioExtractor;
         private MediaCodec audioCodec;
         private AudioTrack audioTrack;
+        private int audioInputBufferSize;
 
 
         @Override
@@ -238,11 +240,11 @@ public class DecodeActivity extends AppCompatActivity {
                     if (mime.startsWith("audio/")) {
                         audioExtractor.selectTrack(i);
                         int mChannel = mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-                        int audioChannel;
+                        int audioChannels;
                         if (mChannel == 1) {
-                            audioChannel = AudioFormat.CHANNEL_OUT_MONO;
+                            audioChannels = AudioFormat.CHANNEL_OUT_MONO;
                         }else {
-                            audioChannel = AudioFormat.CHANNEL_OUT_STEREO;
+                            audioChannels = AudioFormat.CHANNEL_OUT_STEREO;
                         }
                         int audioSampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE);
                         int audioOutFormat;
@@ -253,15 +255,17 @@ public class DecodeActivity extends AppCompatActivity {
                         }
                         int minBufferSize = AudioTrack.getMinBufferSize(
                                 audioSampleRate,
-                                audioChannel,
+                                audioChannels,
                                 audioOutFormat);
+
 //                        int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
-//                        int audioInputBufferSize = minBufferSize > 0 ? minBufferSize * 4 :
-//                                maxInputSize;
+//                        audioInputBufferSize = minBufferSize > 0 ? minBufferSize * 4 : maxInputSize;
+//                        int frameSizeInBytes = audioChannels * 2;
+
                         audioTrack = new AudioTrack(
                                 AudioManager.STREAM_MUSIC,
                                 audioSampleRate,
-                                audioChannel,
+                                audioChannels,
                                 audioOutFormat,
                                 minBufferSize,
                                 AudioTrack.MODE_STREAM);
@@ -362,11 +366,10 @@ public class DecodeActivity extends AppCompatActivity {
                     Log.d(TAG, "Audio OutputBuffer BUFFER_FLAG_END_OF_STREAM");
                     break;
                 }
-
-                audioCodec.stop();
-                audioCodec.release();
-                audioExtractor.release();
             }
+            audioCodec.stop();
+            audioCodec.release();
+            audioExtractor.release();
         }
     }
 }
