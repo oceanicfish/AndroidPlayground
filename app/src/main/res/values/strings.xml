@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AndroidPlayground</string>
+    <string name="audio_record_pcm">Audio Record PCM</string>
+    <string name="start_record_button">Start Record</string>
+    <string name="stop_record_button">Stop Record</string>
+    <string name="play_wav_button">Play wav</string>
+    <string name="convert_to_wav">Convert to wav</string>
+    <string name="decode_button">Media Decode</string>
+</resources>
