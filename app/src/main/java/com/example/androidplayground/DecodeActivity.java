@@ -258,10 +258,6 @@ public class DecodeActivity extends AppCompatActivity {
                                 audioChannels,
                                 audioOutFormat);
 
-//                        int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
-//                        audioInputBufferSize = minBufferSize > 0 ? minBufferSize * 4 : maxInputSize;
-//                        int frameSizeInBytes = audioChannels * 2;
-
                         audioTrack = new AudioTrack(
                                 AudioManager.STREAM_MUSIC,
                                 audioSampleRate,
@@ -338,6 +334,12 @@ public class DecodeActivity extends AppCompatActivity {
                         ByteBuffer audioBufferOut = audioOutputBuffers[audioOutIndex];
                         Log.v(TAG, "Audio Buffer for output : " + audioBufferOut);
 
+                        /**
+                         * there is an additional step for audio output process.
+                         * the decoded audio buffer has to be move to a temporary buffer place
+                         * for saving and written out.
+                         * the original buffer place need to be cleared for the next output process.
+                         */
                         byte[] tempBuffer = new byte[audioBufferOut.limit()];
                         audioBufferOut.position(0);
                         audioBufferOut.get(tempBuffer, 0, audioBufferOut.limit());
@@ -345,17 +347,9 @@ public class DecodeActivity extends AppCompatActivity {
                         if (audioTrack != null) {
                             audioTrack.write(tempBuffer, 0, audioBufferInfo.size);
                         }
-
-//                        while (bufferInfo.presentationTimeUs / 1000 > System.currentTimeMillis() - startMs) {
-//                            try {
-//                                sleep(10);
-//                            }catch (InterruptedException e) {
-//                                Log.v(TAG,
-//                                        "playback speed control failed.");
-//                                e.printStackTrace();
-//                                break;
-//                            }
-//                        }
+                        /**
+                         * ### end of special process of audio. ###
+                         */
 
                         /* There is no need to render since the media is audio.  */
                         audioCodec.releaseOutputBuffer(audioOutIndex,false);
